@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0">Dashboard</h2>
+                <p class="text-muted mb-0">Welcome back, {{ current_user.get_full_name() }}</p>
+            </div>
+            <a href="{{ url_for('prediction') }}" class="btn btn-primary">
+                <i class="fas fa-brain me-2"></i>New Prediction
+            </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3" style="background: rgba(0,212,255,0.1); color: var(--accent-primary);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" style="font-size: 1.5rem;">{{ stats.total_predictions }}</div>
+                            <div class="stat-label">Predictions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3" style="background: rgba(124,58,237,0.1); color: var(--accent-secondary);">
+                            <i class="fas fa-file-csv"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" style="font-size: 1.5rem;">{{ stats.total_uploads }}</div>
+                            <div class="stat-label">CSV Uploads</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3" style="background: rgba(16,185,129,0.1); color: var(--accent-success);">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" style="font-size: 1.5rem;">{{ stats.total_logins }}</div>
+                            <div class="stat-label">Logins</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3" style="background: rgba(245,158,11,0.1); color: var(--accent-warning);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" style="font-size: 1.5rem;">{{ stats.member_since }}</div>
+                            <div class="stat-label">Member Since</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Recent Predictions -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-history me-2" style="color: var(--accent-primary);"></i>Recent Predictions</h5>
+                        <a href="{{ url_for('prediction_history') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if predictions %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Model</th>
+                                        <th>Current</th>
+                                        <th>Predicted</th>
+                                        <th>R2 Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pred in predictions %}
+                                    <tr>
+                                        <td>{{ pred.prediction_date.strftime('%Y-%m-%d') }}</td>
+                                        <td><span class="badge-custom badge-info">{{ pred.model_type }}</span></td>
+                                        <td>${{ "%.2f"|format(pred.current_price) if pred.current_price else 'N/A' }}</td>
+                                        <td>${{ "%.2f"|format(pred.predicted_price) if pred.predicted_price else 'N/A' }}</td>
+                                        <td>{{ "%.3f"|format(pred.confidence_score) if pred.confidence_score else 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--text-muted);"></i>
+                            <p class="text-muted">No predictions yet. <a href="{{ url_for('prediction') }}">Run your first prediction</a></p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Uploads -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-upload me-2" style="color: var(--accent-primary);"></i>Recent Uploads</h5>
+                        <a href="{{ url_for('upload_csv') }}" class="btn btn-sm btn-outline-primary">Upload New</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if uploads %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>Rows</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in uploads %}
+                                    <tr>
+                                        <td>{{ upload.original_filename[:30] }}{% if upload.original_filename|length > 30 %}...{% endif %}</td>
+                                        <td>{{ upload.row_count }}</td>
+                                        <td>
+                                            {% if upload.analysis_status == 'completed' %}
+                                            <span class="badge-custom badge-success">Completed</span>
+                                            {% elif upload.analysis_status == 'pending' %}
+                                            <span class="badge-custom badge-warning">Pending</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-danger">Failed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ upload.upload_date.strftime('%Y-%m-%d') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-csv fa-3x mb-3" style="color: var(--text-muted);"></i>
+                            <p class="text-muted">No uploads yet. <a href="{{ url_for('upload_csv') }}">Upload your first CSV</a></p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

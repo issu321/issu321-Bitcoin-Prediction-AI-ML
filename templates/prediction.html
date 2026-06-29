@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Bitcoin Prediction - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Prediction Form -->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-sliders-h me-2" style="color: var(--accent-primary);"></i>Prediction Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('prediction') }}" novalidate>
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                {{ form.model_type.label(class="form-label") }}
+                                {{ form.model_type(class="form-select") }}
+                                {% if form.model_type.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.model_type.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.days_to_predict.label(class="form-label") }}
+                                {{ form.days_to_predict(class="form-control", type="number", min="1", max="30") }}
+                                {% if form.days_to_predict.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.days_to_predict.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if result %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--accent-primary);"></i>Model Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-white">{{ result.model_info.name }}</h6>
+                        <p class="text-muted small">{{ result.model_info.description }}</p>
+
+                        <h6 class="text-white mt-3">Pros</h6>
+                        <ul class="list-unstyled text-muted small">
+                            {% for pro in result.model_info.pros %}
+                            <li><i class="fas fa-check me-2" style="color: var(--accent-success);"></i>{{ pro }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        <h6 class="text-white mt-3">Cons</h6>
+                        <ul class="list-unstyled text-muted small">
+                            {% for con in result.model_info.cons %}
+                            <li><i class="fas fa-times me-2" style="color: var(--accent-danger);"></i>{{ con }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Results -->
+            <div class="col-lg-8">
+                {% if result %}
+                <!-- Metrics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card text-center">
+                            <div class="stat-icon mx-auto" style="background: rgba(0,212,255,0.1); color: var(--accent-primary);">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem;">${{ "%.2f"|format(result.predictions.current_price) }}</div>
+                            <div class="stat-label">Current Price</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card text-center">
+                            <div class="stat-icon mx-auto" style="background: rgba(124,58,237,0.1); color: var(--accent-secondary);">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem;">${{ "%.2f"|format(result.predictions.predictions[-1]) }}</div>
+                            <div class="stat-label">Predicted Price</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card text-center">
+                            <div class="stat-icon mx-auto" style="background: rgba(16,185,129,0.1); color: var(--accent-success);">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem;">{{ "%.2f"|format(((result.predictions.predictions[-1] - result.predictions.current_price) / result.predictions.current_price * 100)) }}%</div>
+                            <div class="stat-label">Expected Change</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card text-center">
+                            <div class="stat-icon mx-auto" style="background: rgba(245,158,11,0.1); color: var(--accent-warning);">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem;">{{ "%.3f"|format(result.metrics.test_r2) }}</div>
+                            <div class="stat-label">R2 Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2" style="color: var(--accent-primary);"></i>Model Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">Training Metrics</h6>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">RMSE</span>
+                                    <span class="text-white">{{ "%.2f"|format(result.metrics.train_rmse) }}</span>
+                                </div>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">MAE</span>
+                                    <span class="text-white">{{ "%.2f"|format(result.metrics.train_mae) }}</span>
+                                </div>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">R2 Score</span>
+                                    <span class="text-white">{{ "%.4f"|format(result.metrics.train_r2) }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">Test Metrics</h6>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">RMSE</span>
+                                    <span class="text-white">{{ "%.2f"|format(result.metrics.test_rmse) }}</span>
+                                </div>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">MAE</span>
+                                    <span class="text-white">{{ "%.2f"|format(result.metrics.test_mae) }}</span>
+                                </div>
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="text-muted">R2 Score</span>
+                                    <span class="text-white">{{ "%.4f"|format(result.metrics.test_r2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3" style="border-top: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>Training Samples: {{ result.metrics.training_samples }}</span>
+                                <span>Test Samples: {{ result.metrics.test_samples }}</span>
+                                <span>Features: {{ result.metrics.feature_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prediction Table -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-table me-2" style="color: var(--accent-primary);"></i>Price Forecast</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Predicted Price</th>
+                                        <th>Low Estimate (95%)</th>
+                                        <th>High Estimate (105%)</th>
+                                        <th>Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in range(result.predictions.dates|length) %}
+                                    <tr>
+                                        <td>{{ result.predictions.dates[i] }}</td>
+                                        <td><strong style="color: var(--accent-primary);">${{ "%.2f"|format(result.predictions.predictions[i]) }}</strong></td>
+                                        <td class="text-muted">${{ "%.2f"|format(result.predictions.confidence_range[i]) }}</td>
+                                        <td class="text-muted">${{ "%.2f"|format(result.predictions.confidence_range_high[i]) }}</td>
+                                        <td>
+                                            {% if i > 0 and result.predictions.predictions[i] > result.predictions.predictions[i-1] %}
+                                            <span class="badge-custom badge-success"><i class="fas fa-arrow-up me-1"></i>Up</span>
+                                            {% elif i > 0 %}
+                                            <span class="badge-custom badge-danger"><i class="fas fa-arrow-down me-1"></i>Down</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-info">Start</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2" style="color: var(--accent-primary);"></i>Analysis Charts</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ url_for('static', filename=result.chart_path) }}" alt="Analysis Charts" class="img-fluid rounded" style="max-width: 100%;">
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- Empty State -->
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="mb-3">Ready to Predict</h3>
+                        <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                            Configure your prediction settings on the left and click "Run Prediction" to generate Bitcoin price forecasts using machine learning.
+                        </p>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <i class="fas fa-random fa-2x mb-2" style="color: var(--accent-primary);"></i>
+                                    <h6>Random Forest</h6>
+                                    <small class="text-muted">Best accuracy</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <i class="fas fa-chart-line fa-2x mb-2" style="color: var(--accent-secondary);"></i>
+                                    <h6>Linear Regression</h6>
+                                    <small class="text-muted">Fast & interpretable</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <i class="fas fa-vector-square fa-2x mb-2" style="color: var(--accent-success);"></i>
+                                    <h6>SVR</h6>
+                                    <small class="text-muted">Complex patterns</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

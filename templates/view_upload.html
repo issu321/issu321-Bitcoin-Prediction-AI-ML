@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}View Upload - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0">CSV Details</h2>
+                <p class="text-muted mb-0">{{ upload.original_filename }}</p>
+            </div>
+            <a href="{{ url_for('upload_csv') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Uploads
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--accent-primary);"></i>File Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Original Name</small>
+                            <span class="text-white">{{ upload.original_filename }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">File Size</small>
+                            <span class="text-white">{{ "%.2f"|format(upload.file_size / 1024) if upload.file_size else 'N/A' }} KB</span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Rows</small>
+                            <span class="text-white">{{ upload.row_count or 'N/A' }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Columns</small>
+                            <span class="text-white">{{ upload.column_count or 'N/A' }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Upload Date</small>
+                            <span class="text-white">{{ upload.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </div>
+                        <div class="mb-0">
+                            <small class="text-muted d-block">Status</small>
+                            {% if upload.analysis_status == 'completed' %}
+                            <span class="badge-custom badge-success">Completed</span>
+                            {% elif upload.analysis_status == 'pending' %}
+                            <span class="badge-custom badge-warning">Pending</span>
+                            {% else %}
+                            <span class="badge-custom badge-danger">Failed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if analysis.numeric_summary %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calculator me-2" style="color: var(--accent-primary);"></i>Statistics</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Mean</th>
+                                        <th>Min</th>
+                                        <th>Max</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for col, stats in analysis.numeric_summary.items() %}
+                                    <tr>
+                                        <td><small>{{ col[:15] }}{% if col|length > 15 %}...{% endif %}</small></td>
+                                        <td><small>{{ stats.mean }}</small></td>
+                                        <td><small>{{ stats.min }}</small></td>
+                                        <td><small>{{ stats.max }}</small></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-table me-2" style="color: var(--accent-primary);"></i>Data Preview (First 50 Rows)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if preview_data %}
+                        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                            <table class="table table-sm mb-0">
+                                <thead style="position: sticky; top: 0; background: var(--bg-tertiary); z-index: 10;">
+                                    <tr>
+                                        {% for col in preview_columns %}
+                                        <th>{{ col }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in preview_data %}
+                                    <tr>
+                                        {% for col in preview_columns %}
+                                        <td><small>{{ row[col] }}</small></td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted">Unable to preview data</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

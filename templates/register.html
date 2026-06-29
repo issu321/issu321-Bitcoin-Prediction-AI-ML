@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card animate-fade-in-up">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <div class="feature-icon mx-auto mb-3" style="width: 70px; height: 70px;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h3 class="mb-1">Create Account</h3>
+                            <p class="text-muted">Get started with Bitcoin predictions</p>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('register') }}" novalidate>
+                            {{ form.hidden_tag() }}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {{ form.first_name(class="form-control", placeholder="First name") }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {{ form.last_name(class="form-control", placeholder="Last name") }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.username.label(class="form-label") }}
+                                {{ form.username(class="form-control", placeholder="Choose a username") }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control", placeholder="your@email.com") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.password.label(class="form-label") }}
+                                {{ form.password(class="form-control", placeholder="Min 6 characters") }}
+                                {% if form.password.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.confirm_password.label(class="form-label") }}
+                                {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
+                                {% if form.confirm_password.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">Already have an account? <a href="{{ url_for('login') }}" style="color: var(--accent-primary); text-decoration: none;">Sign in</a></p>
+                        </div>
+
+                        <div class="mt-4 pt-4 text-center" style="border-top: 1px solid var(--border-color);">
+                            <p class="text-muted small mb-2">Open source project by <a href="https://github.com/issu321" target="_blank" style="color: var(--accent-primary); text-decoration: none;">issu321</a></p>
+                            <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="btn btn-sm btn-github">
+                                <i class="fab fa-github me-2"></i>View on GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

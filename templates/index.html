@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Home - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="animate-fade-in-up">
+                    <div class="d-inline-block mb-3">
+                        <span class="badge-custom badge-info">
+                            <i class="fas fa-rocket me-1"></i>v{{ app_version }} Now Available
+                        </span>
+                        <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="badge-custom badge-success ms-2 text-decoration-none">
+                            <i class="fab fa-github me-1"></i>Open Source
+                        </a>
+                    </div>
+                    <h1 class="hero-title">
+                        Predict Bitcoin Prices<br>
+                        with <span>Machine Learning</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Harness the power of advanced machine learning algorithms, technical indicators, 
+                        and real-time data analysis to forecast Bitcoin prices with unprecedented accuracy.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-brain me-2"></i>Start Predicting
+                        </a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-chart-pie me-2"></i>Dashboard
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Get Started Free
+                        </a>
+                        <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="btn btn-github btn-lg">
+                            <i class="fab fa-github me-2"></i>View on GitHub
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="mt-4 d-flex gap-3 flex-wrap align-items-center">
+                        <a href="mailto:jaafreeusman@gmail.com" class="text-muted text-decoration-none small">
+                            <i class="fas fa-envelope me-1"></i>jaafreeusman@gmail.com
+                        </a>
+                        <a href="tel:+918884294749" class="text-muted text-decoration-none small">
+                            <i class="fas fa-phone me-1"></i>+91 88842 94749
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="animate-fade-in-up delay-2">
+                    <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border-color);">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">BTC/USD</span>
+                                <span class="badge-custom badge-success"><i class="fas fa-arrow-up me-1"></i>+2.4%</span>
+                            </div>
+                            <h2 class="mb-0" style="font-family: 'JetBrains Mono', monospace; font-size: 2.5rem;">
+                                <span style="color: var(--accent-primary);">$</span>47,832.45
+                            </h2>
+                            <div class="mt-3" style="height: 100px; background: linear-gradient(180deg, rgba(0,212,255,0.1) 0%, transparent 100%); border-radius: 8px; display: flex; align-items: flex-end; padding: 10px; gap: 4px;">
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 40%; opacity: 0.7;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 55%; opacity: 0.8;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 45%; opacity: 0.6;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 70%; opacity: 0.9;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 60%; opacity: 0.7;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 80%; opacity: 1;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 65%; opacity: 0.8;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 90%; opacity: 0.9;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 75%; opacity: 0.7;"></div>
+                                <div style="flex: 1; background: var(--accent-primary); border-radius: 2px; height: 85%; opacity: 0.8;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted">24h Low: $46,210</small>
+                                <small class="text-muted">24h High: $48,150</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon mx-auto" style="background: rgba(0,212,255,0.1); color: var(--accent-primary);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon mx-auto" style="background: rgba(124,58,237,0.1); color: var(--accent-secondary);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.total_predictions }}</div>
+                    <div class="stat-label">Predictions Made</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon mx-auto" style="background: rgba(16,185,129,0.1); color: var(--accent-success);">
+                        <i class="fas fa-file-csv"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.total_uploads }}</div>
+                    <div class="stat-label">CSV Uploads</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon mx-auto" style="background: rgba(245,158,11,0.1); color: var(--accent-warning);">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-value">{{ stats.models_available }}</div>
+                    <div class="stat-label">ML Models</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="mb-3">Powerful <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Features</span></h2>
+            <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+                Everything you need for accurate Bitcoin price prediction and market analysis
+            </p>
+        </div>
+        <div class="row g-4">
+            {% for feature in features %}
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card animate-fade-in-up delay-{{ loop.index }}">
+                    <div class="feature-icon">
+                        <i class="fas {{ feature.icon }}"></i>
+                    </div>
+                    <h5 class="feature-title">{{ feature.title }}</h5>
+                    <p class="feature-desc">{{ feature.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Tools Section -->
+<section class="py-5" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="mb-3">Built with <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Modern Tools</span></h2>
+            <p class="text-muted">Powered by industry-leading technologies</p>
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% for tool in tools %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card text-center p-3" style="border: 1px solid var(--border-color);">
+                    <i class="fab {{ tool.icon }} fa-2x mb-2" style="color: var(--accent-primary);"></i>
+                    <h6 class="mb-1">{{ tool.name }}</h6>
+                    <small class="text-muted">{{ tool.category }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="card p-5 text-center" style="background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, rgba(124,58,237,0.05) 100%); border: 1px solid var(--border-color);">
+            <h2 class="mb-3">Ready to Start Predicting?</h2>
+            <p class="text-muted mb-4" style="max-width: 500px; margin: 0 auto;">
+                Join thousands of users who are already using our platform to make data-driven Bitcoin trading decisions.
+            </p>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-brain me-2"></i>Run Prediction Now
+            </a>
+            {% else %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Create Free Account
+                </a>
+                <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="btn btn-github btn-lg">
+                    <i class="fab fa-github me-2"></i>Star on GitHub
+                </a>
+            </div>
+            {% endif %}
+            <div class="mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+                <p class="text-muted small mb-2">Connect with the developer</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="mailto:jaafreeusman@gmail.com" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-envelope me-1"></i>Email
+                    </a>
+                    <a href="https://wa.me/+918884294749?text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0AWe%27re%20excited%20to%20have%20you%20here.%20Explore%20our%20GitHub%20repository%20for%20the%20latest%20AI%2FML%20features%20and%20updates.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AHow%20can%20we%20assist%20you%20today%3F" target="_blank" class="btn btn-sm btn-whatsapp">
+                        <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                    </a>
+                    <a href="https://t.me/share/url?url=https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML&text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0ADiscover%20AI-powered%20Bitcoin%20price%20predictions%20and%20advanced%20ML%20analytics.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AJoin%20us%20today%21" target="_blank" class="btn btn-sm btn-telegram">
+                        <i class="fab fa-telegram-plane me-1"></i>Telegram
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

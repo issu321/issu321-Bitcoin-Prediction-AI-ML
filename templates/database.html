@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Database - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <h2 class="mb-4">Database Management</h2>
+
+        <!-- Summary Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.total_users }}</div>
+                    <div class="stat-label">Users</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.total_predictions }}</div>
+                    <div class="stat-label">Predictions</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.total_uploads }}</div>
+                    <div class="stat-label">Uploads</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.total_logins }}</div>
+                    <div class="stat-label">Logins</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.failed_logins }}</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card text-center">
+                    <div class="stat-value" style="font-size: 1.5rem;">{{ summary.system_events }}</div>
+                    <div class="stat-label">Events</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-4" id="dbTabs" role="tablist" style="border-bottom: 1px solid var(--border-color);">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="pill" data-bs-target="#users" type="button" role="tab" style="color: var(--text-primary);">
+                    <i class="fas fa-users me-1"></i>Users
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="predictions-tab" data-bs-toggle="pill" data-bs-target="#predictions" type="button" role="tab" style="color: var(--text-primary);">
+                    <i class="fas fa-chart-line me-1"></i>Predictions
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="uploads-tab" data-bs-toggle="pill" data-bs-target="#uploads" type="button" role="tab" style="color: var(--text-primary);">
+                    <i class="fas fa-upload me-1"></i>Uploads
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="logins-tab" data-bs-toggle="pill" data-bs-target="#logins" type="button" role="tab" style="color: var(--text-primary);">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login Logs
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="system-tab" data-bs-toggle="pill" data-bs-target="#system" type="button" role="tab" style="color: var(--text-primary);">
+                    <i class="fas fa-cog me-1"></i>System Logs
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="dbTabsContent">
+            <!-- Users Tab -->
+            <div class="tab-pane fade show active" id="users" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Registered Users</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Name</th>
+                                        <th>Created</th>
+                                        <th>Last Login</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td><strong>{{ user.username }}</strong></td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.get_full_name() or 'N/A' }}</td>
+                                        <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                                        <td>
+                                            {% if user.is_active %}
+                                            <span class="badge-custom badge-success">Active</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-danger">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictions Tab -->
+            <div class="tab-pane fade" id="predictions" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Prediction History</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Model</th>
+                                        <th>Current Price</th>
+                                        <th>Predicted</th>
+                                        <th>R2 Score</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pred in predictions %}
+                                    <tr>
+                                        <td>{{ pred.id }}</td>
+                                        <td>{{ pred.user.username }}</td>
+                                        <td><span class="badge-custom badge-info">{{ pred.model_type }}</span></td>
+                                        <td>${{ "%.2f"|format(pred.current_price) if pred.current_price else 'N/A' }}</td>
+                                        <td>${{ "%.2f"|format(pred.predicted_price) if pred.predicted_price else 'N/A' }}</td>
+                                        <td>{{ "%.3f"|format(pred.confidence_score) if pred.confidence_score else 'N/A' }}</td>
+                                        <td>{{ pred.prediction_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uploads Tab -->
+            <div class="tab-pane fade" id="uploads" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">CSV Uploads</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Filename</th>
+                                        <th>Rows</th>
+                                        <th>Size</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in uploads %}
+                                    <tr>
+                                        <td>{{ upload.id }}</td>
+                                        <td>{{ upload.user.username }}</td>
+                                        <td>{{ upload.original_filename[:30] }}{% if upload.original_filename|length > 30 %}...{% endif %}</td>
+                                        <td>{{ upload.row_count or 'N/A' }}</td>
+                                        <td>{{ "%.1f"|format(upload.file_size / 1024) if upload.file_size else 'N/A' }} KB</td>
+                                        <td>
+                                            {% if upload.analysis_status == 'completed' %}
+                                            <span class="badge-custom badge-success">Completed</span>
+                                            {% elif upload.analysis_status == 'pending' %}
+                                            <span class="badge-custom badge-warning">Pending</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-danger">Failed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ upload.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Logs Tab -->
+            <div class="tab-pane fade" id="logins" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Login Activity</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in login_logs %}
+                                    <tr>
+                                        <td>{{ log.id }}</td>
+                                        <td>{{ log.user.username }}</td>
+                                        <td><code>{{ log.ip_address or 'N/A' }}</code></td>
+                                        <td>
+                                            {% if log.status == 'success' %}
+                                            <span class="badge-custom badge-success">Success</span>
+                                            {% elif log.status == 'failed' %}
+                                            <span class="badge-custom badge-danger">Failed</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-info">Logout</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ log.login_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Logs Tab -->
+            <div class="tab-pane fade" id="system" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">System Events</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>User</th>
+                                        <th>Severity</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in system_logs %}
+                                    <tr>
+                                        <td>{{ log.id }}</td>
+                                        <td><strong>{{ log.action }}</strong></td>
+                                        <td>{{ log.details[:50] }}{% if log.details and log.details|length > 50 %}...{% endif %}</td>
+                                        <td>{{ log.user.username if log.user else 'System' }}</td>
+                                        <td>
+                                            {% if log.severity == 'error' %}
+                                            <span class="badge-custom badge-danger">Error</span>
+                                            {% elif log.severity == 'warning' %}
+                                            <span class="badge-custom badge-warning">Warning</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-info">Info</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

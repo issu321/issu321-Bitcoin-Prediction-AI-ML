@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Upload CSV - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Upload Form -->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-cloud-upload-alt me-2" style="color: var(--accent-primary);"></i>Upload CSV</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('upload_csv') }}" enctype="multipart/form-data" novalidate>
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                {{ form.file.label(class="form-label") }}
+                                {{ form.file(class="form-control", accept=".csv") }}
+                                {% if form.file.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.file.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">Accepted format: .csv files only</div>
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.description.label(class="form-label") }}
+                                {{ form.description(class="form-control", rows="3", placeholder="Optional description of your dataset") }}
+                            </div>
+
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--accent-primary);"></i>CSV Format</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">Expected columns:</p>
+                        <code class="d-block p-2 rounded mb-3" style="background: var(--bg-tertiary); color: var(--accent-primary); font-size: 0.8rem;">
+                            Date, Open, High, Low, Close, Volume
+                        </code>
+                        <p class="text-muted small mb-0">Example row:</p>
+                        <code class="d-block p-2 rounded" style="background: var(--bg-tertiary); color: var(--text-secondary); font-size: 0.75rem;">
+                            2024-01-01, 45000, 46500, 44500, 46000, 35000000
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="col-lg-8">
+                {% if analysis_result %}
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2" style="color: var(--accent-primary);"></i>Analysis Results</h5>
+                        <span class="badge-custom badge-success">Completed</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <h4 class="mb-0" style="color: var(--accent-primary);">{{ analysis_result.shape[0] }}</h4>
+                                    <small class="text-muted">Rows</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <h4 class="mb-0" style="color: var(--accent-secondary);">{{ analysis_result.shape[1] }}</h4>
+                                    <small class="text-muted">Columns</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <h4 class="mb-0" style="color: var(--accent-success);">{{ analysis_result.columns|length }}</h4>
+                                    <small class="text-muted">Fields</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded" style="background: var(--bg-tertiary);">
+                                    <h4 class="mb-0" style="color: var(--accent-warning);">{{ analysis_result.missing_values.values()|sum }}</h4>
+                                    <small class="text-muted">Missing Values</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columns -->
+                        <h6 class="text-white mb-2">Columns</h6>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            {% for col in analysis_result.columns %}
+                            <span class="badge-custom badge-info">{{ col }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Numeric Summary -->
+                        {% if analysis_result.numeric_summary %}
+                        <h6 class="text-white mb-2">Numeric Summary</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Mean</th>
+                                        <th>Std</th>
+                                        <th>Min</th>
+                                        <th>Max</th>
+                                        <th>Median</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for col, stats in analysis_result.numeric_summary.items() %}
+                                    <tr>
+                                        <td><strong>{{ col }}</strong></td>
+                                        <td>{{ stats.mean }}</td>
+                                        <td>{{ stats.std }}</td>
+                                        <td>{{ stats.min }}</td>
+                                        <td>{{ stats.max }}</td>
+                                        <td>{{ stats.median }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+
+                        <!-- Sample Data -->
+                        <h6 class="text-white mb-2">Sample Data (First 5 Rows)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        {% for col in analysis_result.columns %}
+                                        <th>{{ col }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in analysis_result.sample_data[:5] %}
+                                    <tr>
+                                        {% for col in analysis_result.columns %}
+                                        <td>{{ row[col] }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Upload History -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-history me-2" style="color: var(--accent-primary);"></i>Upload History</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if uploads %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Rows</th>
+                                        <th>Columns</th>
+                                        <th>Size</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in uploads %}
+                                    <tr>
+                                        <td>{{ upload.original_filename[:25] }}{% if upload.original_filename|length > 25 %}...{% endif %}</td>
+                                        <td>{{ upload.row_count or 'N/A' }}</td>
+                                        <td>{{ upload.column_count or 'N/A' }}</td>
+                                        <td>{{ "%.2f"|format(upload.file_size / 1024) if upload.file_size else 'N/A' }} KB</td>
+                                        <td>
+                                            {% if upload.analysis_status == 'completed' %}
+                                            <span class="badge-custom badge-success">Completed</span>
+                                            {% elif upload.analysis_status == 'pending' %}
+                                            <span class="badge-custom badge-warning">Pending</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-danger">Failed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ upload.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('view_upload', upload_id=upload.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('delete_upload', upload_id=upload.id) }}" class="d-inline" onsubmit="return confirm('Delete this file?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-csv fa-3x mb-3" style="color: var(--text-muted);"></i>
+                            <p class="text-muted">No uploads yet. Upload your first CSV file to get started.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

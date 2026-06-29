@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="card p-5">
+                    <div class="mb-4">
+                        <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.2)); display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-exclamation-triangle fa-3x" style="color: var(--accent-danger);"></i>
+                        </div>
+                    </div>
+                    <h1 class="display-1 fw-bold mb-2" style="color: var(--accent-danger);">{{ error_code }}</h1>
+                    <h3 class="mb-3">{{ error_message }}</h3>
+                    <p class="text-muted mb-4">Something went wrong. Please try again or go back to the home page.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Go Home
+                        </a>
+                        <a href="javascript:history.back()" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Go Back
+                        </a>
+                    </div>
+                    <div class="mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+                        <p class="text-muted small mb-2">Need assistance?</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="mailto:jaafreeusman@gmail.com" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Email Support
+                            </a>
+                            <a href="https://wa.me/+918884294749?text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0AWe%27re%20excited%20to%20have%20you%20here.%20Explore%20our%20GitHub%20repository%20for%20the%20latest%20AI%2FML%20features%20and%20updates.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AHow%20can%20we%20assist%20you%20today%3F" target="_blank" class="btn btn-sm btn-whatsapp">
+                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

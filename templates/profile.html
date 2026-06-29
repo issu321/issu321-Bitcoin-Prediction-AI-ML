@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-3">
+                            <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--gradient-primary); display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-1">{{ current_user.get_full_name() or current_user.username }}</h4>
+                        <p class="text-muted mb-2">@{{ current_user.username }}</p>
+                        <p class="text-muted small mb-3">{{ current_user.email }}</p>
+                        <span class="badge-custom badge-success">Active Member</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2" style="color: var(--accent-primary);"></i>Recent Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for log in recent_logins[:5] %}
+                            <div class="timeline-item">
+                                <small class="text-muted">{{ log.login_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                                <p class="mb-0 small">
+                                    {% if log.status == 'success' %}
+                                    <i class="fas fa-check-circle me-1" style="color: var(--accent-success);"></i>Login successful
+                                    {% elif log.status == 'failed' %}
+                                    <i class="fas fa-times-circle me-1" style="color: var(--accent-danger);"></i>Login failed
+                                    {% else %}
+                                    <i class="fas fa-sign-out-alt me-1" style="color: var(--accent-primary);"></i>Logout
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-edit me-2" style="color: var(--accent-primary);"></i>Edit Profile</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('profile') }}" novalidate>
+                            {{ form.hidden_tag() }}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {{ form.first_name(class="form-control", placeholder="First name") }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {{ form.last_name(class="form-control", placeholder="Last name") }}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control", placeholder="your@email.com") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Recent Predictions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2" style="color: var(--accent-primary);"></i>Recent Predictions</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_predictions %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Model</th>
+                                        <th>Current</th>
+                                        <th>Predicted</th>
+                                        <th>R2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pred in recent_predictions %}
+                                    <tr>
+                                        <td>{{ pred.prediction_date.strftime('%Y-%m-%d') }}</td>
+                                        <td><span class="badge-custom badge-info">{{ pred.model_type }}</span></td>
+                                        <td>${{ "%.2f"|format(pred.current_price) if pred.current_price else 'N/A' }}</td>
+                                        <td>${{ "%.2f"|format(pred.predicted_price) if pred.predicted_price else 'N/A' }}</td>
+                                        <td>{{ "%.3f"|format(pred.confidence_score) if pred.confidence_score else 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No predictions yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Uploads -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-upload me-2" style="color: var(--accent-primary);"></i>Recent Uploads</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_uploads %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>Rows</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for upload in recent_uploads %}
+                                    <tr>
+                                        <td>{{ upload.original_filename[:30] }}{% if upload.original_filename|length > 30 %}...{% endif %}</td>
+                                        <td>{{ upload.row_count or 'N/A' }}</td>
+                                        <td>
+                                            {% if upload.analysis_status == 'completed' %}
+                                            <span class="badge-custom badge-success">Completed</span>
+                                            {% else %}
+                                            <span class="badge-custom badge-warning">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ upload.upload_date.strftime('%Y-%m-%d') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No uploads yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

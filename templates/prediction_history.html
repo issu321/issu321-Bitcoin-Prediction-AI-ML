@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0">Prediction History</h2>
+                <p class="text-muted mb-0">All your past predictions</p>
+            </div>
+            <a href="{{ url_for('prediction') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Prediction
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+                {% if predictions.items %}
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Model</th>
+                                <th>Current Price</th>
+                                <th>Predicted Price</th>
+                                <th>Expected Change</th>
+                                <th>R2 Score</th>
+                                <th>Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in predictions.items %}
+                            <tr>
+                                <td>{{ pred.prediction_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td><span class="badge-custom badge-info">{{ pred.model_type }}</span></td>
+                                <td>${{ "%.2f"|format(pred.current_price) if pred.current_price else 'N/A' }}</td>
+                                <td><strong style="color: var(--accent-primary);">${{ "%.2f"|format(pred.predicted_price) if pred.predicted_price else 'N/A' }}</strong></td>
+                                <td>
+                                    {% if pred.current_price and pred.predicted_price %}
+                                        {% set change = ((pred.predicted_price - pred.current_price) / pred.current_price * 100) %}
+                                        {% if change > 0 %}
+                                        <span class="badge-custom badge-success"><i class="fas fa-arrow-up me-1"></i>{{ "%.2f"|format(change) }}%</span>
+                                        {% else %}
+                                        <span class="badge-custom badge-danger"><i class="fas fa-arrow-down me-1"></i>{{ "%.2f"|format(change|abs) }}%</span>
+                                        {% endif %}
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ "%.3f"|format(pred.confidence_score) if pred.confidence_score else 'N/A' }}</td>
+                                <td>
+                                    {% if pred.features_used %}
+                                    <small class="text-muted">{{ pred.features_used[:50] }}...</small>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if predictions.pages > 1 %}
+                <div class="p-3">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if predictions.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('prediction_history', page=predictions.prev_num) }}" style="background: var(--bg-card); color: var(--text-primary); border-color: var(--border-color);">Previous</a>
+                            </li>
+                            {% endif %}
+                            {% for page_num in predictions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if page_num == predictions.page %}
+                                    <li class="page-item active">
+                                        <span class="page-link" style="background: var(--accent-primary); border-color: var(--accent-primary);">{{ page_num }}</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('prediction_history', page=page_num) }}" style="background: var(--bg-card); color: var(--text-primary); border-color: var(--border-color);">{{ page_num }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                <li class="page-item disabled"><span class="page-link" style="background: var(--bg-card); color: var(--text-muted); border-color: var(--border-color);">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if predictions.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('prediction_history', page=predictions.next_num) }}" style="background: var(--bg-card); color: var(--text-primary); border-color: var(--border-color);">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--text-muted);"></i>
+                    <p class="text-muted">No predictions yet. <a href="{{ url_for('prediction') }}">Run your first prediction</a></p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

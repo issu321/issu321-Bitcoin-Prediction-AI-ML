@@ -1,0 +1,15 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-wtf
+wtforms
+werkzeug
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+plotly
+cryptography
+email-validator
+bcrypt

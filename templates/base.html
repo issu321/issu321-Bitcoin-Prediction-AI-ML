@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bitcoin Price Prediction AI/ML Platform - Advanced machine learning algorithms for Bitcoin price forecasting. Open source project by issu321.">
+    <meta name="keywords" content="Bitcoin, Prediction, Machine Learning, AI, Cryptocurrency, Forecasting, issu321">
+    <meta name="author" content="issu321 - jaafreeusman@gmail.com">
+    <meta property="og:title" content="{{ app_name }}">
+    <meta property="og:description" content="AI-powered Bitcoin price prediction platform with advanced ML models.">
+    <meta property="og:url" content="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-tertiary: #1a1a3a;
+            --bg-card: #161632;
+            --bg-hover: #202050;
+            --text-primary: #ffffff;
+            --text-secondary: #c0c0e0;
+            --text-muted: #9090b8;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --border-color: #2a2a55;
+            --shadow-color: rgba(0, 212, 255, 0.15);
+            --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            --glass-bg: rgba(18, 18, 42, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --brand-gold: #ffd700;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f5f7fa;
+            --bg-card: #ffffff;
+            --bg-hover: #eef1f6;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --text-muted: #7a7a9a;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #7c3aed;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --border-color: #e0e0e8;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%);
+            --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --brand-gold: #b8860b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+
+        .particle {
+            position: absolute; width: 4px; height: 4px;
+            background: var(--accent-primary); border-radius: 50%;
+            opacity: 0.3; animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(50px); opacity: 0.6; }
+            50% { transform: translateY(-50px) translateX(-50px); opacity: 0.4; }
+            75% { transform: translateY(-150px) translateX(30px); opacity: 0.5; }
+        }
+
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.8rem 0; transition: all 0.4s ease; z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 800; font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .navbar-brand i { -webkit-text-fill-color: var(--accent-primary); margin-right: 0.5rem; }
+
+        .nav-link {
+            color: var(--text-secondary) !important; font-weight: 500;
+            padding: 0.5rem 1rem !important; border-radius: 8px;
+            transition: all 0.3s ease; position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-primary) !important;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .nav-link::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 2px;
+            background: var(--gradient-primary); transition: all 0.3s ease; transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after { width: 60%; }
+
+        .theme-toggle {
+            position: relative; width: 60px; height: 30px;
+            background: var(--bg-tertiary); border-radius: 30px;
+            cursor: pointer; border: 2px solid var(--border-color);
+            transition: all 0.4s ease; display: flex; align-items: center; padding: 2px;
+        }
+
+        .theme-toggle.active { background: var(--accent-primary); }
+
+        .theme-toggle-slider {
+            width: 22px; height: 22px; background: white; border-radius: 50%;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: var(--accent-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .theme-toggle.active .theme-toggle-slider {
+            transform: translateX(30px); color: #f59e0b;
+        }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; transition: all 0.4s ease; overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px var(--shadow-color);
+            border-color: var(--accent-primary);
+        }
+
+        .card-header {
+            background: transparent; border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem; color: var(--text-primary);
+        }
+
+        .card-body { padding: 1.5rem; color: var(--text-primary); }
+
+        .card h2, .card h3, .card h4, .card h5, .card h6 {
+            color: var(--text-primary) !important;
+        }
+
+        .card p, .card span, .card li, .card td, .card th, .card code, .card small {
+            color: var(--text-secondary);
+        }
+
+        .card .text-white {
+            color: var(--text-primary) !important;
+        }
+
+        .btn {
+            border-radius: 10px; font-weight: 600; padding: 0.6rem 1.5rem;
+            transition: all 0.3s ease; border: none; position: relative; overflow: hidden;
+        }
+
+        .btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before { left: 100%; }
+
+        .btn-primary { background: var(--gradient-primary); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-outline-primary { border: 2px solid var(--accent-primary); color: var(--accent-primary); background: transparent; }
+        .btn-outline-primary:hover { background: var(--accent-primary); color: white; }
+
+        .btn-whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); color: white; border: none; }
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3); color: white; }
+        .btn-telegram { background: linear-gradient(135deg, #0088cc, #005f99); color: white; border: none; }
+        .btn-telegram:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 136, 204, 0.3); color: white; }
+        .btn-github { background: linear-gradient(135deg, #333333, #1a1a1a); color: white; border: none; }
+        .btn-github:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: white; }
+
+        .form-control, .form-select {
+            background: var(--bg-tertiary); border: 2px solid var(--border-color);
+            color: var(--text-primary); border-radius: 10px; padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--bg-tertiary); border-color: var(--accent-primary);
+            color: var(--text-primary); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15);
+        }
+
+        .form-label { color: var(--text-secondary); font-weight: 500; margin-bottom: 0.5rem; }
+
+        .alert { border-radius: 12px; border: none; padding: 1rem 1.25rem; backdrop-filter: blur(10px); }
+        .alert-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border-left: 4px solid #10b981; }
+        .alert-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-left: 4px solid #ef4444; }
+        .alert-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-left: 4px solid #f59e0b; }
+        .alert-info { background: rgba(0, 212, 255, 0.15); color: var(--accent-primary); border-left: 4px solid var(--accent-primary); }
+
+        .table { color: var(--text-primary); }
+        .table thead th { background: var(--bg-tertiary); color: var(--accent-primary); font-weight: 600; border-bottom: 2px solid var(--border-color); padding: 1rem; }
+        .table tbody td { padding: 1rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; color: var(--text-secondary); }
+        .table tbody tr:hover { background: var(--bg-hover); }
+        .table tbody tr:hover td { color: var(--text-primary); }
+
+        .stat-card {
+            background: var(--bg-card); border-radius: 16px; padding: 1.5rem;
+            border: 1px solid var(--border-color); position: relative; overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gradient-primary); }
+
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+        .stat-value { font-size: 2rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { color: var(--text-muted); font-size: 0.875rem; font-weight: 500; }
+
+        .feature-card {
+            background: var(--bg-card); border-radius: 20px; padding: 2rem;
+            border: 1px solid var(--border-color); transition: all 0.4s ease; height: 100%; position: relative; overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        .feature-card::after {
+            content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,212,255,0.03) 0%, transparent 70%);
+            transition: all 0.4s ease; opacity: 0;
+        }
+
+        .feature-card:hover::after { opacity: 1; }
+        .feature-card:hover { transform: translateY(-10px); border-color: var(--accent-primary); box-shadow: 0 20px 40px var(--shadow-color); }
+
+        .feature-icon {
+            width: 70px; height: 70px; border-radius: 20px; background: var(--gradient-primary);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            color: white; margin-bottom: 1.5rem; position: relative; z-index: 1;
+        }
+
+        .feature-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; position: relative; z-index: 1; color: var(--text-primary); }
+        .feature-desc { color: var(--text-secondary); line-height: 1.7; position: relative; z-index: 1; }
+
+        .hero-section { position: relative; padding: 120px 0 80px; overflow: hidden; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; color: var(--text-primary); }
+        .hero-title span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem; max-width: 600px; }
+
+        .glow-text { text-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* Premium Footer Branding */
+        .footer {
+            background: var(--bg-secondary); border-top: 1px solid var(--border-color);
+            padding: 0; margin-top: auto; position: relative; overflow: hidden;
+        }
+
+        .footer::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .footer-brand-section {
+            background: linear-gradient(135deg, rgba(0,212,255,0.03) 0%, rgba(124,58,237,0.03) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 3rem 0;
+        }
+
+        .footer-brand-title {
+            font-size: 1.75rem; font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand-tagline {
+            color: var(--text-muted); font-size: 0.95rem; max-width: 400px;
+        }
+
+        .footer-connect-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-connect-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer-connect-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 25px var(--shadow-color);
+        }
+
+        .footer-connect-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
+
+        .footer-connect-icon.github { background: rgba(51,51,51,0.15); color: #ffffff; }
+        .footer-connect-icon.email { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .footer-connect-icon.phone { background: rgba(16,185,129,0.15); color: #10b981; }
+        .footer-connect-icon.whatsapp { background: rgba(37,211,102,0.15); color: #25d366; }
+        .footer-connect-icon.telegram { background: rgba(0,136,204,0.15); color: #0088cc; }
+
+        [data-theme="light"] .footer-connect-icon.github { background: rgba(51,51,51,0.1); color: #333333; }
+
+        .footer-connect-info h6 {
+            font-size: 0.85rem; font-weight: 700;
+            color: var(--text-primary); margin-bottom: 0.15rem;
+        }
+
+        .footer-connect-info span {
+            font-size: 0.75rem; color: var(--text-muted);
+        }
+
+        .footer-main {
+            padding: 3rem 0 2rem;
+        }
+
+        .footer h5, .footer h6 { color: var(--text-primary) !important; font-weight: 700; margin-bottom: 1rem; }
+        .footer a { color: var(--text-muted) !important; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .footer a:hover { color: var(--accent-primary) !important; transform: translateX(3px); }
+        .footer p { color: var(--text-muted); }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            background: var(--bg-primary);
+        }
+
+        .footer-copyright {
+            color: var(--text-muted); font-size: 0.875rem;
+        }
+
+        .footer-copyright a {
+            color: var(--accent-primary) !important; font-weight: 600;
+        }
+
+        /* Floating Contact FAB */
+        .fab-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .fab-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: white; cursor: pointer;
+            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease; position: relative;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .fab-btn.whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .fab-btn.telegram { background: linear-gradient(135deg, #0088cc, #005f99); }
+        .fab-btn.github { background: linear-gradient(135deg, #333, #1a1a1a); }
+
+        .fab-tooltip {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .fab-btn:hover .fab-tooltip {
+            opacity: 1;
+            right: 65px;
+        }
+
+        /* Brand Badge */
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .brand-badge:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(0,212,255,0.2);
+        }
+
+        .brand-badge i { font-size: 0.9rem; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-secondary); }
+
+        .spinner-container {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 26, 0.95); z-index: 9999;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+
+        .spinner-container.active { display: flex; }
+        .spinner-ring { width: 60px; height: 60px; border: 4px solid var(--border-color); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .badge-custom { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .badge-info { background: rgba(0, 212, 255, 0.2); color: var(--accent-primary); }
+
+        .progress { background: var(--bg-tertiary); border-radius: 10px; height: 8px; overflow: hidden; }
+        .progress-bar { background: var(--gradient-primary); border-radius: 10px; transition: width 0.6s ease; }
+
+        .chart-container { background: var(--bg-card); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border-color); }
+
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--gradient-primary); }
+        .timeline-item { position: relative; padding-bottom: 1.5rem; }
+        .timeline-item::before { content: ''; position: absolute; left: -2rem; top: 0.3rem; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-primary); border: 3px solid var(--bg-primary); transform: translateX(-5px); }
+        .timeline-item p { color: var(--text-secondary); }
+        .timeline-item small { color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .fab-container { bottom: 1rem; right: 1rem; }
+            .fab-btn { width: 48px; height: 48px; font-size: 1.25rem; }
+            .footer-connect-grid { grid-template-columns: 1fr; }
+        }
+
+        .main-wrapper { position: relative; z-index: 1; min-height: calc(100vh - 200px); }
+
+        h1, h2, h3, h4, h5, h6 { color: var(--text-primary) !important; }
+        p { color: var(--text-secondary); }
+        .text-muted { color: var(--text-muted) !important; }
+        .text-white { color: var(--text-primary) !important; }
+        .text-secondary { color: var(--text-secondary) !important; }
+
+        .dropdown-menu { background: var(--bg-card) !important; border-color: var(--border-color) !important; }
+        .dropdown-item { color: var(--text-primary) !important; }
+        .dropdown-item:hover { background: var(--bg-hover) !important; color: var(--accent-primary) !important; }
+        .dropdown-divider { border-color: var(--border-color) !important; }
+
+        .nav-pills .nav-link { color: var(--text-secondary) !important; }
+        .nav-pills .nav-link.active { background: var(--gradient-primary) !important; color: white !important; }
+
+        .page-link { background: var(--bg-card) !important; color: var(--text-primary) !important; border-color: var(--border-color) !important; }
+        .page-item.active .page-link { background: var(--accent-primary) !important; border-color: var(--accent-primary) !important; color: white !important; }
+        .page-item.disabled .page-link { background: var(--bg-tertiary) !important; color: var(--text-muted) !important; }
+
+        code { color: var(--accent-primary) !important; background: var(--bg-tertiary) !important; }
+
+        .form-text { color: var(--text-muted) !important; }
+
+        .list-group-item { background: var(--bg-card) !important; color: var(--text-primary) !important; border-color: var(--border-color) !important; }
+
+        .text-danger { color: #ef4444 !important; }
+        .text-success { color: #10b981 !important; }
+        .text-warning { color: #f59e0b !important; }
+        .text-info { color: var(--accent-primary) !important; }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="spinner-container" id="spinner">
+        <div class="spinner-ring mb-3"></div>
+        <p class="text-muted">Processing...</p>
+    </div>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fab fa-bitcoin"></i>Bitcoin Predictor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'features' %}active{% endif %}" href="{{ url_for('features') }}">
+                            <i class="fas fa-star me-1"></i>Features
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-chart-pie me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'prediction' %}active{% endif %}" href="{{ url_for('prediction') }}">
+                            <i class="fas fa-brain me-1"></i>Predict
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'upload_csv' %}active{% endif %}" href="{{ url_for('upload_csv') }}">
+                            <i class="fas fa-upload me-1"></i>Upload
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'database_view' %}active{% endif %}" href="{{ url_for('database_view') }}">
+                            <i class="fas fa-database me-1"></i>Database
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="brand-badge d-none d-lg-inline-flex">
+                        <i class="fab fa-github"></i>Star on GitHub
+                    </a>
+                    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                        <div class="theme-toggle-slider">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                        <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>{{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="fas fa-chart-pie me-2"></i>Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Sign In</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show animate-fade-in-up" role="alert">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="main-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Premium Footer with Branding -->
+    <footer class="footer">
+        <!-- Brand Connect Section -->
+        <div class="footer-brand-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 mb-4 mb-lg-0">
+                        <div class="footer-brand-title">
+                            <i class="fab fa-bitcoin me-2" style="-webkit-text-fill-color: var(--accent-primary);"></i>Bitcoin Predictor AI
+                        </div>
+                        <p class="footer-brand-tagline">
+                            Advanced machine learning-powered Bitcoin price prediction platform. 
+                            Open source and community driven.
+                        </p>
+                        <div class="d-flex gap-2 mt-3">
+                            <span class="badge-custom badge-info"><i class="fas fa-code-branch me-1"></i>v{{ app_version }}</span>
+                            <span class="badge-custom badge-success"><i class="fas fa-heart me-1"></i>Open Source</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <h6 class="mb-3" style="color: var(--text-primary); font-weight: 700;">
+                            <i class="fas fa-handshake me-2" style="color: var(--accent-primary);"></i>Connect With Us
+                        </h6>
+                        <div class="footer-connect-grid">
+                            <!-- GitHub -->
+                            <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="footer-connect-card">
+                                <div class="footer-connect-icon github">
+                                    <i class="fab fa-github"></i>
+                                </div>
+                                <div class="footer-connect-info">
+                                    <h6>GitHub Repository</h6>
+                                    <span>issu321/Bitcoin-Prediction-AI-ML</span>
+                                </div>
+                            </a>
+                            <!-- Email -->
+                            <a href="mailto:jaafreeusman@gmail.com" class="footer-connect-card">
+                                <div class="footer-connect-icon email">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="footer-connect-info">
+                                    <h6>Email Us</h6>
+                                    <span>jaafreeusman@gmail.com</span>
+                                </div>
+                            </a>
+                            <!-- Phone -->
+                            <a href="tel:+918884294749" class="footer-connect-card">
+                                <div class="footer-connect-icon phone">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div class="footer-connect-info">
+                                    <h6>Call / SMS</h6>
+                                    <span>+91 88842 94749</span>
+                                </div>
+                            </a>
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/+918884294749?text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0AWe%27re%20excited%20to%20have%20you%20here.%20Explore%20our%20GitHub%20repository%20for%20the%20latest%20AI%2FML%20features%20and%20updates.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AHow%20can%20we%20assist%20you%20today%3F" target="_blank" class="footer-connect-card">
+                                <div class="footer-connect-icon whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <div class="footer-connect-info">
+                                    <h6>WhatsApp</h6>
+                                    <span>Auto-welcome message</span>
+                                </div>
+                            </a>
+                            <!-- Telegram -->
+                            <a href="https://t.me/share/url?url=https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML&text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0ADiscover%20AI-powered%20Bitcoin%20price%20predictions%20and%20advanced%20ML%20analytics.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AJoin%20us%20today%21" target="_blank" class="footer-connect-card">
+                                <div class="footer-connect-icon telegram">
+                                    <i class="fab fa-telegram-plane"></i>
+                                </div>
+                                <div class="footer-connect-info">
+                                    <h6>Telegram</h6>
+                                    <span>Share with welcome msg</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Footer -->
+        <div class="footer-main">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            <i class="fab fa-bitcoin me-2" style="-webkit-text-fill-color: var(--accent-primary);"></i>Bitcoin Predictor
+                        </h5>
+                        <p class="text-muted">Advanced machine learning-powered Bitcoin price prediction platform with real-time analysis and forecasting.</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="mb-3">Quick Links</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="{{ url_for('index') }}">Home</a></li>
+                            <li><a href="{{ url_for('about') }}">About</a></li>
+                            <li><a href="{{ url_for('features') }}">Features</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="mb-3">Resources</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="{{ url_for('prediction') }}">Predictions</a></li>
+                            <li><a href="{{ url_for('upload_csv') }}">Data Upload</a></li>
+                            <li><a href="{{ url_for('database_view') }}">Database</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="footer-copyright mb-0">
+                            <i class="far fa-copyright me-1"></i>{{ current_year }} Bitcoin Price Predictor. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                        <p class="footer-copyright mb-0">
+                            Made with <i class="fas fa-heart mx-1" style="color: #ef4444;"></i> by 
+                            <a href="https://github.com/issu321" target="_blank">issu321</a> | 
+                            <a href="mailto:jaafreeusman@gmail.com">jaafreeusman@gmail.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Action Buttons -->
+    <div class="fab-container d-none d-md-flex">
+        <a href="https://github.com/issu321/issu321-Bitcoin-Prediction-AI-ML" target="_blank" class="fab-btn github">
+            <i class="fab fa-github"></i>
+            <span class="fab-tooltip">View on GitHub</span>
+        </a>
+        <a href="https://wa.me/+918884294749?text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0AWe%27re%20excited%20to%20have%20you%20here.%20Explore%20our%20GitHub%20repository%20for%20the%20latest%20AI%2FML%20features%20and%20updates.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AHow%20can%20we%20assist%20you%20today%3F" target="_blank" class="fab-btn whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            <span class="fab-tooltip">Chat on WhatsApp</span>
+        </a>
+        <a href="https://t.me/share/url?url=https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML&text=Welcome%20to%20Bitcoin%20Prediction%20AI%2FML%20Platform%21%20%F0%9F%9A%80%0A%0ADiscover%20AI-powered%20Bitcoin%20price%20predictions%20and%20advanced%20ML%20analytics.%0A%0A%F0%9F%93%A7%20Email%3A%20jaafreeusman%40gmail.com%0A%F0%9F%8C%90%20GitHub%3A%20https%3A%2F%2Fgithub.com%2Fissu321%2Fissu321-Bitcoin-Prediction-AI-ML%0A%0AJoin%20us%20today%21" target="_blank" class="fab-btn telegram">
+            <i class="fab fa-telegram-plane"></i>
+            <span class="fab-tooltip">Share on Telegram</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            toggle.classList.toggle('active');
+
+            if (newTheme === 'light') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+
+            {% if current_user.is_authenticated %}
+            fetch('/profile/theme', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme: newTheme })
+            });
+            {% endif %}
+
+            localStorage.setItem('theme', newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || '{% if current_user.is_authenticated %}{{ current_user.theme_preference }}{% else %}dark{% endif %}';
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+
+            html.setAttribute('data-theme', savedTheme);
+
+            if (savedTheme === 'light') {
+                toggle.classList.add('active');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+
+            createParticles();
+        });
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const spinner = document.getElementById('spinner');
+                if (spinner) spinner.classList.add('active');
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
